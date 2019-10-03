@@ -19,13 +19,15 @@ r"""Example using TF Lite to classify a given image using an Edge TPU.
    install the Edge TPU runtime (`libedgetpu.so`) and `tflite_runtime`. For
    device setup instructions, see g.co/coral/setup.
 
-   Example usage (use `download.sh` to get these files):
+   Example usage:
    ```
    python3 classify_image.py \
-     --model models/mobilenet_v2_1.0_224_inat_bird_quant_edgetpu.tflite  \
-     --labels models/inat_bird_labels.txt \
-     --image images/parrot.jpg
+     --model models/mobilenet_v1_1.0_224_quant_edgetpu.tflite \
+     --labels models/labels_mobilenet_quant_v1_224.txt \
+     --image images/grace_hopper.bmp
    ```
+
+   Use the `download.sh` script to download the example TF Lite model.
 """
 
 import argparse
@@ -84,7 +86,7 @@ def main():
       '--labels', help='File path of labels file.', required=True)
   parser.add_argument('--image', help='Image to be classified.', required=True)
   parser.add_argument(
-      '--top_k', help='Number of classifications to list', type=int, default=1)
+      '--top_k', help='Number of classifications to list', type=int, default=5)
   parser.add_argument(
       '--count', help='Number of times to run inference', type=int, default=5)
   args = parser.parse_args()
@@ -99,7 +101,7 @@ def main():
   image = Image.open(args.image).resize((width, height), Image.ANTIALIAS)
 
   print('----INFERENCE TIME----')
-  print('Note: The first inference on Edge TPU is slow because it includes',
+  print('Note: The first inference is slow because it includes',
         'loading the model into Edge TPU memory.')
   for _ in range(args.count):
     start_time = time.monotonic()
