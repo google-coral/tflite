@@ -11,6 +11,4 @@ https://www.tensorflow.org/lite/guide/python).
 For Coral device setup instructions, see [g.co/coral/setup](
 https://g.co/coral/setup).
 
-Before running the examples, install the required Python dependencies
-and download the example models by running the `download.sh` script
-located in this directory.
+See the README file in each directory for setup and operation instructions.

@@ -1,3 +1,0 @@
-# Python packages required for TF Lite examples
-numpy
-Pillow
