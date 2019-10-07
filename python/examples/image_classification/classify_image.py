@@ -1,5 +1,4 @@
-#!/usr/bin/python3
-#
+# python3
 # Copyright 2019 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,8 +33,10 @@ import numpy as np
 
 from PIL import Image
 
-from tflite_runtime.interpreter import Interpreter
-from tflite_runtime.interpreter import load_delegate
+import tflite_runtime.interpreter as tflite
+
+
+EDGETPU_SHARED_LIB = 'libedgetpu.so.1'
 
 
 def load_labels(filename):
@@ -90,9 +91,9 @@ def main():
   args = parser.parse_args()
 
   print('Initializing TF Lite interpreter...')
-  interpreter = Interpreter(
+  interpreter = tflite.Interpreter(
       model_path=args.model,
-      experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
+      experimental_delegates=[tflite.load_delegate(EDGETPU_SHARED_LIB)])
   interpreter.allocate_tensors()
   _, height, width, _ = interpreter.get_input_details()[0]['shape']
 

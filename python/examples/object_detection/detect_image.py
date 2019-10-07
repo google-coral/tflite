@@ -1,5 +1,4 @@
-#!/usr/bin/python3
-#
+# python3
 # Copyright 2019 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,8 +22,11 @@ import numpy as np
 
 from PIL import Image
 from PIL import ImageDraw
-from tflite_runtime.interpreter import Interpreter
-from tflite_runtime.interpreter import load_delegate
+
+import tflite_runtime.interpreter as tflite
+
+
+EDGETPU_SHARED_LIB = 'libedgetpu.so.1'
 
 
 def load_labels(path):
@@ -120,15 +122,15 @@ def main():
       type=float,
       default=0.4)
   parser.add_argument(
-      '--output',
-      help='File path for the result image with annotations')
+      '--output', help='File path for the result image with annotations')
   parser.add_argument(
       '--count', help='Number of times to run inference', type=int, default=5)
   args = parser.parse_args()
 
   labels = load_labels(args.labels)
-  interpreter = Interpreter(
-      args.model, experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
+  interpreter = tflite.Interpreter(
+      args.model,
+      experimental_delegates=[tflite.load_delegate(EDGETPU_SHARED_LIB)])
   interpreter.allocate_tensors()
   _, input_height, input_width, _ = interpreter.get_input_details()[0]['shape']
   input_image = Image.open(args.input).convert('RGB').resize(
@@ -156,6 +158,7 @@ def main():
     print('Image saved as', output_image)
     # Display it on attached monitor
     img.show()
+
 
 if __name__ == '__main__':
   main()
