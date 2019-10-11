@@ -23,16 +23,16 @@ r"""Example using TF Lite to classify a given image using an Edge TPU.
    python3 classify_image.py \
      --model models/mobilenet_v2_1.0_224_inat_bird_quant_edgetpu.tflite  \
      --labels models/inat_bird_labels.txt \
-     --image images/parrot.jpg
+     --input images/parrot.jpg
    ```
 """
 
 import argparse
 import time
-import numpy as np
 
 from PIL import Image
 
+import classify
 import tflite_runtime.interpreter as tflite
 
 
@@ -44,75 +44,58 @@ def load_labels(filename):
     return [line.strip() for line in f.readlines()]
 
 
-def set_input_tensor(interpreter, image):
-  tensor_index = interpreter.get_input_details()[0]['index']
-  input_tensor = interpreter.tensor(tensor_index)()[0]
-  input_tensor[:, :] = image
-
-
-def classify_image(interpreter, image, top_k):
-  """Performs image classification.
-
-  Args:
-    interpreter: The TF Lite interpreter object.
-    image: The image to classify, already downscaled to match the input tensor.
-    top_k: The number of classifications to return.
-
-  Returns:
-    A list of results sorted by probability, each one as a tuple of
-    (label_index, probability).
-  """
-  set_input_tensor(interpreter, image)
-  interpreter.invoke()
-  output_details = interpreter.get_output_details()[0]
-  output = np.squeeze(interpreter.get_tensor(output_details['index']))
-
-  # If the model is quantized (uint8 data), then dequantize the results
-  if output_details['dtype'] == np.uint8:
-    scale, zero_point = output_details['quantization']
-    output = scale * (output - zero_point)
-
-  ordered_indices = output.argsort()[-top_k:][::-1]
-  return [(i, output[i]) for i in ordered_indices]
+def make_interpreter(model_file):
+  model_file, *device = model_file.split('@')
+  return tflite.Interpreter(
+      model_path=model_file,
+      experimental_delegates=[
+          tflite.load_delegate(EDGETPU_SHARED_LIB,
+                               {'device': device[0]} if device else {})
+      ])
 
 
 def main():
   parser = argparse.ArgumentParser(
       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument(
-      '--model', help='File path of .tflite file.', required=True)
+      '-m', '--model', required=True, help='File path of .tflite file.')
   parser.add_argument(
-      '--labels', help='File path of labels file.', required=True)
-  parser.add_argument('--image', help='Image to be classified.', required=True)
+      '-l', '--labels', required=True, help='File path of labels file.')
   parser.add_argument(
-      '--top_k', help='Number of classifications to list', type=int, default=1)
+      '-i', '--input', required=True, help='Image to be classified.')
   parser.add_argument(
-      '--count', help='Number of times to run inference', type=int, default=5)
+      '-k', '--top_k', type=int, default=1,
+      help='Max number of classification results')
+  parser.add_argument(
+      '-t', '--threshold', type=float, default=0.0,
+      help='Classification score threshold')
+  parser.add_argument(
+      '-c', '--count', type=int, default=5,
+      help='Number of times to run inference')
   args = parser.parse_args()
 
-  print('Initializing TF Lite interpreter...')
-  interpreter = tflite.Interpreter(
-      model_path=args.model,
-      experimental_delegates=[tflite.load_delegate(EDGETPU_SHARED_LIB)])
-  interpreter.allocate_tensors()
-  _, height, width, _ = interpreter.get_input_details()[0]['shape']
+  labels = load_labels(args.labels)
 
-  image = Image.open(args.image).resize((width, height), Image.ANTIALIAS)
+  interpreter = make_interpreter(args.model)
+  interpreter.allocate_tensors()
+
+  size = classify.input_size(interpreter)
+  image = Image.open(args.input).convert('RGB').resize(size, Image.ANTIALIAS)
+  classify.set_input(interpreter, image)
 
   print('----INFERENCE TIME----')
   print('Note: The first inference on Edge TPU is slow because it includes',
         'loading the model into Edge TPU memory.')
   for _ in range(args.count):
-    start_time = time.monotonic()
-    results = classify_image(interpreter, image, args.top_k)
-    elapsed_ms = (time.monotonic() - start_time) * 1000
-    print('%.1fms' % elapsed_ms)
-
-  labels = load_labels(args.labels)
+    start = time.monotonic()
+    interpreter.invoke()
+    inference_time = time.monotonic() - start
+    classes = classify.get_output(interpreter, args.top_k, args.threshold)
+    print('%.1fms' % (inference_time * 1000))
 
   print('-------RESULTS--------')
-  for label_id, prob in results:
-    print('%s: %.5f' % (labels[label_id], prob))
+  for index, score in classes:
+    print('%s: %.5f' % (labels[index], score))
 
 
 if __name__ == '__main__':
