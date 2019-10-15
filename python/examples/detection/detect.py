@@ -18,7 +18,48 @@ import collections
 import numpy as np
 
 Object = collections.namedtuple('Object', ['id', 'score', 'bbox'])
-BBox = collections.namedtuple('BBox', ['xmin', 'ymin', 'xmax', 'ymax'])
+
+
+class BBox(collections.namedtuple('BBox', ['xmin', 'ymin', 'xmax', 'ymax'])):
+  __slots__ = ()
+
+  @property
+  def width(self):
+    return self.xmax - self.xmin
+
+  @property
+  def height(self):
+    return self.ymax - self.ymin
+
+  @property
+  def area(self):
+    return self.width * self.height
+
+  @property
+  def valid(self):
+    return self.width >= 0 and self.height >= 0
+
+  @staticmethod
+  def intersect(a, b):
+    return BBox(xmin=max(a.xmin, b.xmin),
+                ymin=max(a.ymin, b.ymin),
+                xmax=min(a.xmax, b.xmax),
+                ymax=min(a.ymax, b.ymax))
+
+  @staticmethod
+  def union(a, b):
+    return BBox(xmin=min(a.xmin, b.xmin),
+                ymin=min(a.ymin, b.ymin),
+                xmax=max(a.xmax, b.xmax),
+                ymax=max(a.ymax, b.ymax))
+
+  @staticmethod
+  def intersection_over_union(a, b):
+    intersection = BBox.intersect(a, b)
+    if not intersection.valid:
+      return 0.0
+    intersection_area = intersection.area
+    return intersection_area / (a.area + b.area - intersection_area)
 
 
 def input_size(interpreter):
@@ -68,7 +109,7 @@ def get_output(interpreter, score_threshold, image_scale=1.0):
   count = int(output_tensor(interpreter, 3))
 
   width, height = input_size(interpreter)
-  scale_x, scale_y = (width - 1) / image_scale, (height - 1) / image_scale
+  scale_x, scale_y = width / image_scale, height / image_scale
 
   def make(i):
     ymin, xmin, ymax, xmax = boxes[i]

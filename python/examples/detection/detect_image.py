@@ -28,18 +28,25 @@ import tflite_runtime.interpreter as tflite
 EDGETPU_SHARED_LIB = 'libedgetpu.so.1'
 
 
-def load_labels(path):
-  """Loads the labels file. Supports files with or without index numbers."""
-  with open(path, 'r', encoding='utf-8') as f:
+def load_labels(path, encoding='utf-8'):
+  """Loads labels from file (with or without index numbers).
+
+  Args:
+    path: path to label file.
+    encoding: label file encoding.
+  Returns:
+    Dictionary mapping indices to labels.
+  """
+  with open(path, 'r', encoding=encoding) as f:
     lines = f.readlines()
-    labels = {}
-    for row_number, content in enumerate(lines):
-      pair = re.split(r'[:\s]+', content.strip(), maxsplit=1)
-      if len(pair) == 2 and pair[0].strip().isdigit():
-        labels[int(pair[0])] = pair[1].strip()
-      else:
-        labels[row_number] = pair[0].strip()
-  return labels
+    if not lines:
+      return {}
+
+    if lines[0].split(' ', maxsplit=1)[0].isdigit():
+      pairs = [line.split(' ', maxsplit=1) for line in lines]
+      return {int(index): label.strip() for index, label in pairs}
+    else:
+      return {index: line.strip() for index, line in enumerate(lines)}
 
 
 def make_interpreter(model_file):
@@ -56,8 +63,8 @@ def draw_objects(draw, objs, labels):
   """Draws the bounding box and label for each object."""
   for obj in objs:
     bbox = obj.bbox
-    rect = [(bbox.xmin, bbox.ymin), (bbox.xmax, bbox.ymax)]
-    draw.rectangle(rect, outline='red')
+    draw.rectangle([(bbox.xmin, bbox.ymin), (bbox.xmax, bbox.ymax)],
+                   outline='red')
     draw.text((bbox.xmin + 10, bbox.ymin + 10),
               '%s\n%.2f' % (labels[obj.id], obj.score),
               fill='red')

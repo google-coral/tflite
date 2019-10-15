@@ -39,9 +39,25 @@ import tflite_runtime.interpreter as tflite
 EDGETPU_SHARED_LIB = 'libedgetpu.so.1'
 
 
-def load_labels(filename):
-  with open(filename, 'r') as f:
-    return [line.strip() for line in f.readlines()]
+def load_labels(path, encoding='utf-8'):
+  """Loads labels from file (with or without index numbers).
+
+  Args:
+    path: path to label file.
+    encoding: label file encoding.
+  Returns:
+    Dictionary mapping indices to labels.
+  """
+  with open(path, 'r', encoding=encoding) as f:
+    lines = f.readlines()
+    if not lines:
+      return {}
+
+    if lines[0].split(' ', maxsplit=1)[0].isdigit():
+      pairs = [line.split(' ', maxsplit=1) for line in lines]
+      return {int(index): label.strip() for index, label in pairs}
+    else:
+      return {index: line.strip() for index, line in enumerate(lines)}
 
 
 def make_interpreter(model_file):
@@ -94,8 +110,8 @@ def main():
     print('%.1fms' % (inference_time * 1000))
 
   print('-------RESULTS--------')
-  for index, score in classes:
-    print('%s: %.5f' % (labels[index], score))
+  for klass in classes:
+    print('%s: %.5f' % (labels[klass.id], klass.score))
 
 
 if __name__ == '__main__':
