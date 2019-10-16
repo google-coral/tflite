@@ -49,11 +49,9 @@ python3 detect_image.py \
   --output images/grace_hopper_processed.bmp
 ```
 
-<figure style="margin-left:0">
-  <img style="width:200px"
-       src="https://github.com/google-coral/edgetpu/raw/master/test_data/grace_hopper.bmp" />
-  <figcaption><b>Figure 1.</b> grace_hopper.bmp</figcaption>
-</figure>
+<img width="200"
+     src="https://github.com/google-coral/edgetpu/raw/master/test_data/grace_hopper.bmp" />
+<br><b>Figure 1.</b> grace_hopper.bmp
 
 You should see results like this:
 

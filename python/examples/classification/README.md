@@ -47,11 +47,9 @@ python3 classify_image.py \
   --image images/parrot.jpg
 ```
 
-<figure style="margin-left:0">
-  <img style="width:200px"
-       src="https://github.com/google-coral/edgetpu/raw/master/test_data/parrot.jpg" />
-  <figcaption><b>Figure 1.</b> parrot.jpg</figcaption>
-</figure>
+<img width="200"
+     src="https://github.com/google-coral/edgetpu/raw/master/test_data/parrot.jpg" />
+<br><b>Figure 1.</b> parrot.jpg
 
 You should see results like this:
 
