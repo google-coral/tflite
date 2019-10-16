@@ -15,7 +15,6 @@
 """Example using TF Lite to detect objects in a given image."""
 
 import argparse
-import re
 import time
 
 from PIL import Image
