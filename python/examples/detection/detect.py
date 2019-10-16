@@ -21,26 +21,61 @@ Object = collections.namedtuple('Object', ['id', 'score', 'bbox'])
 
 
 class BBox(collections.namedtuple('BBox', ['xmin', 'ymin', 'xmax', 'ymax'])):
+  """Bounding box.
+
+  Represents a rectangle which sides are either vertical or horizontal, parallel
+  to the x or y axis.
+  """
   __slots__ = ()
 
   @property
   def width(self):
+    """Returns bounding box width."""
     return self.xmax - self.xmin
 
   @property
   def height(self):
+    """Returns bounding box height."""
     return self.ymax - self.ymin
 
   @property
   def area(self):
+    """Returns bound box area."""
     return self.width * self.height
 
   @property
   def valid(self):
+    """Returns whether bounding box is valid or not.
+
+    Valid bounding box has xmin <= xmax and ymin <= ymax which is equivalent to
+    width >= 0 and height >= 0.
+    """
     return self.width >= 0 and self.height >= 0
+
+  def scale(self, sx, sy):
+    """Returns scaled bounding box."""
+    return BBox(xmin=sx * self.xmin,
+                ymin=sy * self.ymin,
+                xmax=sx * self.xmax,
+                ymax=sy * self.ymax)
+
+  def translate(self, dx, dy):
+    """Returns translated bounding box."""
+    return BBox(xmin=dx + self.xmin,
+                ymin=dy + self.ymin,
+                xmax=dx + self.xmax,
+                ymax=dy + self.ymax)
+
+  def map(self, f):
+    """Returns bounding box modified by applying f for each coordinate."""
+    return BBox(xmin=f(self.xmin),
+                ymin=f(self.ymin),
+                xmax=f(self.xmax),
+                ymax=f(self.ymax))
 
   @staticmethod
   def intersect(a, b):
+    """Returns the intersection of two bounding boxes (may be invalid)."""
     return BBox(xmin=max(a.xmin, b.xmin),
                 ymin=max(a.ymin, b.ymin),
                 xmax=min(a.xmax, b.xmax),
@@ -48,18 +83,20 @@ class BBox(collections.namedtuple('BBox', ['xmin', 'ymin', 'xmax', 'ymax'])):
 
   @staticmethod
   def union(a, b):
+    """Returns the union of two bounding boxes (always valid)."""
     return BBox(xmin=min(a.xmin, b.xmin),
                 ymin=min(a.ymin, b.ymin),
                 xmax=max(a.xmax, b.xmax),
                 ymax=max(a.ymax, b.ymax))
 
   @staticmethod
-  def intersection_over_union(a, b):
+  def iou(a, b):
+    """Returns intersection-over-union value."""
     intersection = BBox.intersect(a, b)
     if not intersection.valid:
       return 0.0
-    intersection_area = intersection.area
-    return intersection_area / (a.area + b.area - intersection_area)
+    area = intersection.area
+    return area / (a.area + b.area - area)
 
 
 def input_size(interpreter):
@@ -109,15 +146,16 @@ def get_output(interpreter, score_threshold, image_scale=1.0):
   count = int(output_tensor(interpreter, 3))
 
   width, height = input_size(interpreter)
-  scale_x, scale_y = width / image_scale, height / image_scale
+  sx, sy = width / image_scale, height / image_scale
 
   def make(i):
     ymin, xmin, ymax, xmax = boxes[i]
-    xmin, xmax = int(scale_x * xmin), int(scale_x * xmax)
-    ymin, ymax = int(scale_y * ymin), int(scale_y * ymax)
     return Object(
         id=int(class_ids[i]),
         score=scores[i],
-        bbox=BBox(xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax))
+        bbox=BBox(xmin=xmin,
+                  ymin=ymin,
+                  xmax=xmax,
+                  ymax=ymax).scale(sx, sy).map(int))
 
   return [make(i) for i in range(count) if scores[i] >= score_threshold]
