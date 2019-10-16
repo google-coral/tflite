@@ -15,7 +15,7 @@ image is to the terminal screen.
 1.  First, be sure you have completed the [setup instructions for your Coral
     device](https://coral.withgoogle.com/docs/accelerator/get-started/).
 
-    Importantly, you should have the latest TensorFlow lite runtime installed
+    Importantly, you should have the latest TensorFlow Lite runtime installed
     (as per the [Python quickstart](
     https://www.tensorflow.org/lite/guide/python)
 
@@ -30,9 +30,9 @@ image is to the terminal screen.
 3.  Install this example's dependencies:
 
     ```
-    cd tflite/python/examples/image_classification
+    cd tflite/python/examples/classification
 
-    bash install_requirements.sh
+    ./install_requirements.sh
     ```
 
 ## Run the code
@@ -66,13 +66,12 @@ Note: The first inference on Edge TPU is slow because it includes loading the mo
 2.9ms
 2.9ms
 -------RESULTS--------
-923 Ara macao (Scarlet Macaw): 0.76562
+Ara macao (Scarlet Macaw): 0.76562
 ```
 
 To demonstrate varying inference speeds, the example repeats the same inference
 five times. Your inference speeds might be different based on your host platform
 and whether you're using the USB Accelerator with a USB 2.0 or 3.0 connection.
-
 
 To compare the performance when not using the Edge TPU, try
 running it again with the model that's *not* compiled for the Edge TPU:

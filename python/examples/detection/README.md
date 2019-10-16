@@ -16,7 +16,7 @@ labels drawn on top.
 1.  First, be sure you have completed the [setup instructions for your Coral
     device](https://coral.withgoogle.com/docs/accelerator/get-started/).
 
-    Importantly, you should have the latest TensorFlow lite runtime installed
+    Importantly, you should have the latest TensorFlow Lite runtime installed
     (as per the [Python quickstart](
     https://www.tensorflow.org/lite/guide/python)
 
@@ -31,9 +31,9 @@ labels drawn on top.
 3.  Install this example's dependencies:
 
     ```
-    cd tflite/python/examples/object_detection
+    cd tflite/python/examples/detection
 
-    bash install_requirements.sh
+    ./install_requirements.sh
     ```
 
 ## Run the code
@@ -45,7 +45,8 @@ downloaded by the above script (photo shown in figure 1):
 python3 detect_image.py \
   --model models/mobilenet_ssd_v2_coco_quant_postprocess_edgetpu.tflite \
   --labels models/coco_labels.txt \
-  --input images/grace_hopper.bmp
+  --input images/grace_hopper.bmp \
+  --output images/grace_hopper_processed.bmp
 ```
 
 <figure style="margin-left:0">
@@ -66,15 +67,14 @@ Note: The first inference is slow because it includes loading the model into Edg
 19.91 ms
 19.90 ms
 -------RESULTS--------
------------------------------------------
-person
-score =  0.789062
-bounding box = 0 513 16 596
------------------------------------------
 tie
-score =  0.789062
-bounding box = 227 290 425 544
-Image saved as object_detection_result.jpg
+  id:     31
+  score:  0.83984375
+  bbox:   BBox(xmin=228, ymin=421, xmax=293, ymax=545)
+person
+  id:     0
+  score:  0.83984375
+  bbox:   BBox(xmin=2, ymin=5, xmax=513, ymax=596)
 ```
 
 To demonstrate varying inference speeds, the example repeats the same inference
