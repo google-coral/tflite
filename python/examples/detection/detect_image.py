@@ -65,7 +65,7 @@ def draw_objects(draw, objs, labels):
     draw.rectangle([(bbox.xmin, bbox.ymin), (bbox.xmax, bbox.ymax)],
                    outline='red')
     draw.text((bbox.xmin + 10, bbox.ymin + 10),
-              '%s\n%.2f' % (labels[obj.id], obj.score),
+              '%s\n%.2f' % (labels.get(obj.id, obj.id), obj.score),
               fill='red')
 
 
@@ -74,10 +74,10 @@ def main():
       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument('-m', '--model', required=True,
                       help='File path of .tflite file.')
-  parser.add_argument('-l', '--labels', required=True,
-                      help='File path of labels file.')
   parser.add_argument('-i', '--input', required=True,
                       help='File path of image to process.')
+  parser.add_argument('-l', '--labels',
+                      help='File path of labels file.')
   parser.add_argument('-t', '--threshold', type=float, default=0.4,
                       help='Score threshold for detected objects.')
   parser.add_argument('-o', '--output',
@@ -86,7 +86,7 @@ def main():
                       help='Number of times to run inference')
   args = parser.parse_args()
 
-  labels = load_labels(args.labels)
+  labels = load_labels(args.labels) if args.labels else {}
   interpreter = make_interpreter(args.model)
   interpreter.allocate_tensors()
 
@@ -109,7 +109,7 @@ def main():
     print('No objects detected')
 
   for obj in objs:
-    print(labels[obj.id])
+    print(labels.get(obj.id, obj.id))
     print('  id:    ', obj.id)
     print('  score: ', obj.score)
     print('  bbox:  ', obj.bbox)

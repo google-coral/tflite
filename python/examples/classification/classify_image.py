@@ -76,9 +76,9 @@ def main():
   parser.add_argument(
       '-m', '--model', required=True, help='File path of .tflite file.')
   parser.add_argument(
-      '-l', '--labels', required=True, help='File path of labels file.')
-  parser.add_argument(
       '-i', '--input', required=True, help='Image to be classified.')
+  parser.add_argument(
+      '-l', '--labels', help='File path of labels file.')
   parser.add_argument(
       '-k', '--top_k', type=int, default=1,
       help='Max number of classification results')
@@ -90,7 +90,7 @@ def main():
       help='Number of times to run inference')
   args = parser.parse_args()
 
-  labels = load_labels(args.labels)
+  labels = load_labels(args.labels) if args.labels else {}
 
   interpreter = make_interpreter(args.model)
   interpreter.allocate_tensors()
@@ -111,7 +111,7 @@ def main():
 
   print('-------RESULTS--------')
   for klass in classes:
-    print('%s: %.5f' % (labels[klass.id], klass.score))
+    print('%s: %.5f' % (labels.get(klass.id, klass.id), klass.score))
 
 
 if __name__ == '__main__':
