@@ -128,7 +128,8 @@ def set_input(interpreter, size, resize):
   w, h = int(w * scale), int(h * scale)
   tensor = input_tensor(interpreter)
   tensor.fill(0)  # padding
-  tensor[:h, :w] = resize((w, h))
+  _, _, channel = tensor.shape
+  tensor[:h, :w] = np.reshape(resize((w, h)), (h, w, channel))
   return scale
 
 

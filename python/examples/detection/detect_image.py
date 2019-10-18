@@ -90,7 +90,7 @@ def main():
   interpreter = make_interpreter(args.model)
   interpreter.allocate_tensors()
 
-  image = Image.open(args.input).convert('RGB')
+  image = Image.open(args.input)
   scale = detect.set_input(interpreter, image.size,
                            lambda size: image.resize(size, Image.ANTIALIAS))
 
@@ -115,6 +115,7 @@ def main():
     print('  bbox:  ', obj.bbox)
 
   if args.output:
+    image = image.convert('RGB')
     draw_objects(ImageDraw.Draw(image), objs, labels)
     image.save(args.output)
     image.show()
