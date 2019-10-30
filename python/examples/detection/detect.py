@@ -153,7 +153,7 @@ def get_output(interpreter, score_threshold, image_scale=1.0):
     ymin, xmin, ymax, xmax = boxes[i]
     return Object(
         id=int(class_ids[i]),
-        score=scores[i],
+        score=float(scores[i]),
         bbox=BBox(xmin=xmin,
                   ymin=ymin,
                   xmax=xmax,
