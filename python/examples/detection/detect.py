@@ -130,7 +130,7 @@ def set_input(interpreter, size, resize):
   tensor.fill(0)  # padding
   _, _, channel = tensor.shape
   tensor[:h, :w] = np.reshape(resize((w, h)), (h, w, channel))
-  return scale
+  return scale, scale
 
 
 def output_tensor(interpreter, i):
@@ -139,7 +139,7 @@ def output_tensor(interpreter, i):
   return np.squeeze(tensor)
 
 
-def get_output(interpreter, score_threshold, image_scale=1.0):
+def get_output(interpreter, score_threshold, image_scale=(1.0, 1.0)):
   """Returns list of detected objects."""
   boxes = output_tensor(interpreter, 0)
   class_ids = output_tensor(interpreter, 1)
@@ -147,7 +147,8 @@ def get_output(interpreter, score_threshold, image_scale=1.0):
   count = int(output_tensor(interpreter, 3))
 
   width, height = input_size(interpreter)
-  sx, sy = width / image_scale, height / image_scale
+  image_scale_x, image_scale_y = image_scale
+  sx, sy = width / image_scale_x, height / image_scale_y
 
   def make(i):
     ymin, xmin, ymax, xmax = boxes[i]
