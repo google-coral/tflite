@@ -38,6 +38,8 @@ labels drawn on top.
 
 ## Run the code
 
+### Single Image Input
+
 Use this command to run object detection with the model and photo
 downloaded by the above script (photo shown in figure 1):
 
@@ -87,4 +89,34 @@ python3 detect_image.py \
   --model models/mobilenet_ssd_v2_coco_quant_postprocess.tflite \
   --labels models/coco_labels.txt \
   --input images/grace_hopper.bmp
+```
+
+
+### Webcam Video Input
+
+Use this command to run object detection with the model and video streaming from your computer's camera:
+
+```
+python3 detect_camera.py \
+  --model models/mobilenet_ssd_v2_coco_quant_postprocess_edgetpu.tflite \
+  --labels models/coco_labels.txt \
+  --output images/processed.avi
+```
+
+The video output with detection plays on screen, and saves to `images/processed.avi`. Omit the `--output` argument to not save the video.
+
+To compare the performance when not using the Edge TPU, try
+running it again with the model that's *not* compiled for the Edge TPU:
+
+```
+python3 detect_camera.py \
+  --model models/mobilenet_ssd_v2_coco_quant_postprocess.tflite \
+  --labels models/coco_labels.txt \
+  --output images/processed.avi
+```
+
+You will need to install open-cv to run this example:
+
+```
+pip3 install opencv-python
 ```
