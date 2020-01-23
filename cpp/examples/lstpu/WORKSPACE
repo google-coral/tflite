@@ -31,12 +31,14 @@ http_archive(
     urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/0.9.0/bazel_skylib-0.9.0.tar.gz"],
 )
 
+TENSORFLOW_COMMIT = "f7fc5b0cce36dd28f4a69cf9c40caf07e7aea605";
+TENSORFLOW_SHA256 = "0e29fffc8de3d85cbd2124b9c689cc5123b504eee54f4f1f941fd821003ba40d"
 http_archive(
     name = "org_tensorflow",
-    sha256 = "2602e177164e7152bd8c7a9a1cab71898ec84ae707ca442cafbd966abdbb07b7",
-    strip_prefix = "tensorflow-5d0b55dd4a00c74809e5b32217070a26ac6ef823",
+    sha256 = TENSORFLOW_SHA256,
+    strip_prefix = "tensorflow-" + TENSORFLOW_COMMIT,
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/5d0b55dd4a00c74809e5b32217070a26ac6ef823.tar.gz",
+        "https://github.com/tensorflow/tensorflow/archive/" + TENSORFLOW_COMMIT + ".tar.gz",
     ],
 )
 
