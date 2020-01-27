@@ -102,9 +102,9 @@ def main():
   print('Note: The first inference is slow because it includes',
         'loading the model into Edge TPU memory.')
   for _ in range(args.count):
-    start = time.monotonic()
+    start = time.perf_counter()
     interpreter.invoke()
-    inference_time = time.monotonic() - start
+    inference_time = time.perf_counter() - start
     objs = detect.get_output(interpreter, args.threshold, scale)
     print('%.2f ms' % (inference_time * 1000))
 
