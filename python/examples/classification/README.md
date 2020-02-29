@@ -15,9 +15,9 @@ image is to the terminal screen.
 1.  First, be sure you have completed the [setup instructions for your Coral
     device](https://coral.withgoogle.com/docs/accelerator/get-started/).
 
-    Importantly, you should have the latest TensorFlow Lite runtime installed
-    (as per the [Python quickstart](
-    https://www.tensorflow.org/lite/guide/python)
+    Importantly, you should have the latest TensorFlow Lite runtime installed,
+    as per the [Python quickstart](
+    https://www.tensorflow.org/lite/guide/python).
 
 2.  Clone this Git repo onto your computer:
 
