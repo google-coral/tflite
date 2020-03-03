@@ -19,6 +19,10 @@ readonly TEST_DATA_URL=https://github.com/google-coral/edgetpu/raw/master/test_d
 # Install required Python packages,
 # but not on Mendel (Dev Board)—it has these already and shouldn't use pip
 if [[ ! -f /etc/mendel_version ]]; then
+  if ! python3 -m pip --version > /dev/null; then
+    echo "Install pip first by following https://pip.pypa.io/en/stable/installing/ guide."
+    exit 1
+  fi
   python3 -m pip install numpy Pillow
 fi
 
