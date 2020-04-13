@@ -21,24 +21,43 @@ import numpy as np
 Class = collections.namedtuple('Class', ['id', 'score'])
 
 
+def input_details(interpreter, key):
+  """Returns input details by specified key."""
+  return interpreter.get_input_details()[0][key]
+
+
 def input_size(interpreter):
   """Returns input image size as (width, height) tuple."""
-  _, height, width, _ = interpreter.get_input_details()[0]['shape']
+  _, height, width, _ = input_details(interpreter, 'shape')
   return width, height
 
 
 def input_tensor(interpreter):
   """Returns input tensor view as numpy array of shape (height, width, 3)."""
-  tensor_index = interpreter.get_input_details()[0]['index']
+  tensor_index = input_details(interpreter, 'index')
   return interpreter.tensor(tensor_index)()[0]
 
 
-def output_tensor(interpreter):
-  """Returns dequantized output tensor."""
+def output_tensor(interpreter, dequantize=True):
+  """Returns output tensor of classification model.
+
+  Integer output tensor is dequantized by default.
+
+  Args:
+    interpreter: tflite.Interpreter;
+    dequantize: bool; whether to dequantize integer output tensor.
+
+  Returns:
+    Output tensor as numpy array.
+  """
   output_details = interpreter.get_output_details()[0]
   output_data = np.squeeze(interpreter.tensor(output_details['index'])())
-  scale, zero_point = output_details['quantization']
-  return scale * (output_data - zero_point)
+
+  if dequantize and np.issubdtype(output_details['dtype'], np.integer):
+    scale, zero_point = output_details['quantization']
+    return scale * (output_data - zero_point)
+
+  return output_data
 
 
 def set_input(interpreter, data):
