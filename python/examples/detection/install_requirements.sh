@@ -32,8 +32,8 @@ fi
 MODEL_DIR="${SCRIPT_DIR}/models"
 mkdir -p "${MODEL_DIR}"
 (cd "${MODEL_DIR}"
-curl -OL "${TEST_DATA_URL}/mobilenet_ssd_v2_coco_quant_postprocess_edgetpu.tflite" \
-     -OL "${TEST_DATA_URL}/mobilenet_ssd_v2_coco_quant_postprocess.tflite" \
+curl -OL "${TEST_DATA_URL}/ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite" \
+     -OL "${TEST_DATA_URL}/ssd_mobilenet_v2_coco_quant_postprocess.tflite" \
      -OL "${TEST_DATA_URL}/coco_labels.txt")
 
 # Get example image
