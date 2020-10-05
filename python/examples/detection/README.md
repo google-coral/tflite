@@ -25,7 +25,7 @@ labels drawn on top.
     ```
     mkdir google-coral && cd google-coral
 
-    git clone https://github.com/google-coral/tflite --depth 1
+    git clone https://github.com/yaotechiu/tflite --depth 1
     ```
 
 3.  Install this example's dependencies:
