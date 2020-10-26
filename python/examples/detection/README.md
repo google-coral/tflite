@@ -43,7 +43,7 @@ downloaded by the above script (photo shown in figure 1):
 
 ```
 python3 detect_image.py \
-  --model models/mobilenet_ssd_v2_coco_quant_postprocess_edgetpu.tflite \
+  --model models/ssd_mobilenet_v2_coco_quant_postprocess_edgetpu.tflite \
   --labels models/coco_labels.txt \
   --input images/grace_hopper.bmp \
   --output images/grace_hopper_processed.bmp
