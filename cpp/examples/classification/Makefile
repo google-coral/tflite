@@ -8,7 +8,7 @@
 # 3. Download external dependencies for TensorFlow Lite:
 #    $ tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
 # 4. Cross-compile TensorFlow Lite for aarch64:
-#    $ tensorflow/tensorflow/lite/tools/make/build_generic_aarch64_lib.sh
+#    $ tensorflow/tensorflow/lite/tools/make/build_aarch64_lib.sh
 # 5. Cross-compile classify.cc example for aarch64:
 #    $ TENSORFLOW_DIR=<location> make
 # 6. Copy the following files to Coral Dev board:
@@ -38,7 +38,7 @@ classify: classify.cc
 	-I$(MAKEFILE_DIR)/edgetpu_runtime/libedgetpu/ \
 	-I$(TENSORFLOW_DIR) \
 	-I$(TENSORFLOW_DIR)/tensorflow/lite/tools/make/downloads/flatbuffers/include \
-	-L$(TENSORFLOW_DIR)/tensorflow/lite/tools/make/gen/generic-aarch64_armv8-a/lib \
+	-L$(TENSORFLOW_DIR)/tensorflow/lite/tools/make/gen/linux_aarch64/lib \
 	-L$(MAKEFILE_DIR)/edgetpu_runtime/libedgetpu/direct/aarch64/ \
 	-ltensorflow-lite -l:libedgetpu.so.1.0 -lpthread -lm -ldl
 
