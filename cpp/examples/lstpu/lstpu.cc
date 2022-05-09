@@ -14,7 +14,7 @@
 #include <iostream>
 #include <memory>
 
-#include "edgetpu_c.h"
+#include "tflite/public/edgetpu_c.h"
 
 std::string ToString(edgetpu_device_type type) {
   switch (type) {

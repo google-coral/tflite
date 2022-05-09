@@ -8,10 +8,11 @@
 #include <utility>
 #include <vector>
 
-#include "edgetpu_c.h"
+#include "tensorflow/lite/builtin_op_data.h"
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
+#include "tflite/public/edgetpu.h"
 
 namespace {
 constexpr size_t kBmpFileHeaderSize = 14;
@@ -130,17 +131,6 @@ int main(int argc, char* argv[]) {
   const std::string image_file = argv[3];
   const float threshold = std::stof(argv[4]);
 
-  // Find TPU device.
-  size_t num_devices;
-  std::unique_ptr<edgetpu_device, decltype(&edgetpu_free_devices)> devices(
-      edgetpu_list_devices(&num_devices), &edgetpu_free_devices);
-
-  if (num_devices == 0) {
-    std::cerr << "No connected TPU found" << std::endl;
-    return 1;
-  }
-  const auto& device = devices.get()[0];
-
   // Load labels.
   auto labels = ReadLabels(label_file);
   if (labels.empty()) {
@@ -164,17 +154,19 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  // Create interpreter.
+  // Get edgetpu context.
+  auto edgetpu_context = edgetpu::EdgeTpuManager::GetSingleton()->OpenDevice();
   tflite::ops::builtin::BuiltinOpResolver resolver;
+  resolver.AddCustom(edgetpu::kCustomOp, edgetpu::RegisterCustomOp());
+
+  // Create interpreter.
   std::unique_ptr<tflite::Interpreter> interpreter;
   if (tflite::InterpreterBuilder(*model, resolver)(&interpreter) != kTfLiteOk) {
     std::cerr << "Cannot create interpreter" << std::endl;
-    return 1;
+    exit(EXIT_FAILURE);
   }
-
-  auto* delegate =
-      edgetpu_create_delegate(device.type, device.path, nullptr, 0);
-  interpreter->ModifyGraphWithDelegate({delegate, edgetpu_free_delegate});
+  interpreter->SetExternalContext(kTfLiteEdgeTpuContext, edgetpu_context.get());
+  interpreter->SetNumThreads(1);
 
   // Allocate tensors.
   if (interpreter->AllocateTensors() != kTfLiteOk) {
