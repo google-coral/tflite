@@ -29,6 +29,7 @@ r"""Example using TF Lite to classify a given image using an Edge TPU.
 
 import argparse
 import time
+import pigpio as pg
 
 from PIL import Image
 
