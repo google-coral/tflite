@@ -78,7 +78,7 @@ def make_interpreter(model_file):
 def main():
   
   p1 = pg.pi()
-  p1.set_mode(2, PI_OUTPUT) # GPIO 2 as output
+  p1.set_mode(2, pg.OUTPUT) # GPIO 2 as output
   p1.write(2, 0)
   
   parser = argparse.ArgumentParser(
