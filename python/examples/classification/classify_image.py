@@ -76,6 +76,11 @@ def make_interpreter(model_file):
 
 
 def main():
+  
+  p1 = pg.pi()
+  p1.set_mode(2, PI_OUTPUT) # GPIO 2 as output
+  p1.write(2, 0)
+  
   parser = argparse.ArgumentParser(
       formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument(
@@ -96,7 +101,12 @@ def main():
   args = parser.parse_args()
 
   labels = load_labels(args.labels) if args.labels else {}
-
+  
+  # marking for potential lining of gpio
+  p1.write(2, 1)
+  time.sleep(0.05)
+  p1.write(2, 0)
+  
   interpreter = make_interpreter(args.model)
   interpreter.allocate_tensors()
 
