@@ -136,7 +136,7 @@ def main():
   
   try:
     while True:
-      time.sleep(0.01)
+      time.sleep(0.001)
   except KeyboardInterrupt:
     print("Cleaning up...")
     GPIO.cleanup()
