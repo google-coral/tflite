@@ -99,6 +99,11 @@ def main():
       '-c', '--count', type=int, default=5,
       help='Number of times to run inference')
   args = parser.parse_args()
+
+  labels = load_labels(args.labels) if args.labels else {}
+  
+  interpreter = make_interpreter(args.model)
+  interpreter.allocate_tensors()
   
   # Defining interrupt routine
   def run_inference(channel):
@@ -107,18 +112,13 @@ def main():
     inference_time = time.perf_counter() - start
     classify.get_output(interpreter, args.top_k, args.threshold)
     print('%.1fms' % (inference_time * 1000))
-  
+    
   GPIO.setup(INTERRUPT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
   
   GPIO.add_event_detect(
     INTERRUPT_PIN, GPIO.RISING,
     callback = run_inference, bouncetime = 50
   )
-
-  labels = load_labels(args.labels) if args.labels else {}
-  
-  interpreter = make_interpreter(args.model)
-  interpreter.allocate_tensors()
 
   size = classify.input_size(interpreter)
   image = Image.open(args.input).convert('RGB').resize(size, Image.ANTIALIAS)
