@@ -105,7 +105,7 @@ def main():
     start = time.perf_counter()
     interpreter.invoke()
     inference_time = time.perf_counter() - start
-    classify.get_classes(interpreter, args.top_k, args.threshold)
+    classify.get_output(interpreter, args.top_k, args.threshold)
     print('%.1fms' % (inference_time * 1000))
   
   GPIO.setup(INTERRUPT_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
