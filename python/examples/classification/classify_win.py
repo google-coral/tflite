@@ -118,13 +118,15 @@ def main():
   start = time.perf_counter()
   interpreter.invoke()
   inference_time = time.perf_counter() - start
-  classify.get_output(interpreter, args.top_k, args.threshold)
+  classes = classify.get_output(interpreter, args.top_k, args.threshold)
   print('%.1fms' % (inference_time * 1000))
   
-  for i in range(10):
-    run_inference()
-  
+  # for i in range(10):
+  #   run_inference()
 
+  # print("-------RESULTS--------")
+  # for klass in classes:
+  #   print('%s: %.5f' % (labels.get(klass.id, klass.id), klass.score))
 
 if __name__ == '__main__':
   main()
