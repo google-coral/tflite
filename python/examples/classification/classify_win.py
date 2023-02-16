@@ -121,8 +121,8 @@ def main():
   classes = classify.get_output(interpreter, args.top_k, args.threshold)
   print('%.1fms' % (inference_time * 1000))
   
-  # for i in range(10):
-  #   run_inference()
+  for i in range(4):
+    run_inference()
 
   # print("-------RESULTS--------")
   # for klass in classes:
