@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": [
+                "--model", "${workspaceFolder}\\python\\examples\\classification\\models\\mobilenet_v2_1.0_224_inat_bird_quant_edgetpu.tflite", 
+                "--labels", "${workspaceFolder}\\python\\examples\\classification\\models\\inat_bird_labels.txt",
+                "--input", "${workspaceFolder}\\python\\examples\\classification\\images\\parrot.jpg"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}
