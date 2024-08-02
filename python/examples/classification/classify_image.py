@@ -100,7 +100,7 @@ def main():
   interpreter.allocate_tensors()
 
   size = classify.input_size(interpreter)
-  image = Image.open(args.input).convert('RGB').resize(size, Image.ANTIALIAS)
+  image = Image.open(args.input).convert('RGB').resize(size, Image.LANCZOS)
   classify.set_input(interpreter, image)
 
   print('----INFERENCE TIME----')
